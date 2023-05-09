@@ -289,10 +289,13 @@ class App extends Component {
 
     // Encrypt data
     const encryptedData = await this.encryption(data, key);
+	const auth = 'Basic ' + Buffer.from('2PH0wsFbxuPFOGi0c54vhTUAoG4' + ':' + '42bcfa3a24e927e339f3ec1106e4661f').toString('base64');
 
     try {
       // Set IPFS client and upload data to IPFS
-      const ipfsClient = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
+	  
+      
+	  const ipfsClient = ipfsHttpClient({url: 'https://ipfs.infura.io:5001/api/v0/add?pin=true', headers: {authorization: auth}});
       const added = await ipfsClient.add(
         Buffer.from(encryptedData),
         {
@@ -305,7 +308,7 @@ class App extends Component {
 
     } catch (error){
       alert(
-        `Failed to upload to IPFS.`,
+        `Failed to upload to IPFS.` + auth,
       );
       console.error(error)
     }
@@ -319,9 +322,10 @@ class App extends Component {
     try {
 
       // Get file from IPFS by hash/URI
+	  const auth = 'Basic ' + Buffer.from('2PH0wsFbxuPFOGi0c54vhTUAoG4' + ':' + '42bcfa3a24e927e339f3ec1106e4661f').toString('base64');
       const fetchOutput = await fetch(`https://ipfs.infura.io:5001/api/v0/block/get?arg=${ipfsHash}`, {
         method: "POST",
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', Authorization: auth},
       }).then(res => {
         return res.body.getReader().read( );
       });
